@@ -38,7 +38,7 @@ class App extends Component {
 
     renderGreetingWidget() {
         if (!this.state.touched) {
-            return null
+            return null;
         }
 
         return (
