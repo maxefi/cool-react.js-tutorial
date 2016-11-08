@@ -1,7 +1,7 @@
 import express from 'express';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
-import App from 'components/App';
+import App from 'components/HelloWorldPage/HelloWorldPage';
 
 const app = express();
 
