@@ -1,5 +1,5 @@
 import React from 'react';
-import {IndexRoute, Route} from 'react-router';
+import { IndexRoute, Route } from 'react-router';
 import App from 'components/App';
 import CounterPage from 'components/CountersPage';
 import HelloWorldPage from 'components/HelloWorldPage';
