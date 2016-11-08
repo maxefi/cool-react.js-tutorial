@@ -1,15 +1,32 @@
 import express from 'express';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
-import App from 'components/HelloWorldPage/HelloWorldPage';
+import { match, RouterContext } from 'react-router';
+import routes from './routes';
 
 const app = express();
 
 app.use(
     (req, res) => {
-        const componentHTML = ReactDOM.renderToString(<App/>);
+        match(
+            { routes, location: req.url }, (error, redirectLocation, renderProps) => {
+                if (redirectLocation) {
+                    return res.redirect(301, redirectLocation.pathname + redirectLocation.search);
+                }
 
-        res.end(renderHTML(componentHTML));
+                if (error) {
+                    return res.status(500).send(error.message);
+                }
+
+                if (!renderProps) {
+                    return res.status(404).send('Not found');
+                }
+
+                const componentHTML = ReactDOM.renderToString(<RouterContext {...renderProps}/>)
+
+                return res.end(renderHTML(componentHTML));
+            }
+        );
     }
 );
 
