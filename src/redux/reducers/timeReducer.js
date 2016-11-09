@@ -1,5 +1,5 @@
-import { TIME_REQUIEST_STARTED, TIME_REQUEST_FINISHED, TIME_REQUEST_ERROR } from 'redux/actions/timeActions'
-
+import { TIME_REQUEST_STARTED, TIME_REQUEST_FINISHED, TIME_REQUEST_ERROR } from 'redux/actions/timeActions'
+;
 const initialState = {
     time: null,
     errors: null,
@@ -8,7 +8,7 @@ const initialState = {
 
 export default function (state = initialState, action) {
     switch (action.type) {
-        case TIME_REQUIEST_STARTED:
+        case TIME_REQUEST_STARTED:
             return Object.assign({}, state, { loading: true, errors: null });
         case TIME_REQUEST_FINISHED:
             return {
