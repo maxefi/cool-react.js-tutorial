@@ -87,7 +87,7 @@ module.exports = {
     },
     // #todo read documentation about these
     devtool: process.env.NODE_ENV !== 'production' ? 'source-map' : null,
-    //solbind CORS couse of a different ports on dev-server and the app
+    //solvind CORS couse of a different ports on dev-server and the app
     devServer: {
         headers: { 'Access-Controll-Allow-Origin': '*' }
     }
