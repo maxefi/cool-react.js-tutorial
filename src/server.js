@@ -7,6 +7,7 @@ import { match, RouterContext } from 'react-router';
 import routes from './routes';
 import { Provider } from 'react-redux';
 import configureStore from './redux/configureStore';
+import { timeRequest } from './redux/actions/timeActions';
 
 const app = express();
 
@@ -25,31 +26,33 @@ app.use((req, res) => {
         },
         currentLocation: req.url,
         cookies: req.cookies
-    })).then(() => match({ routes: routes(store), location: req.url }, (error, redirectLocation, renderProps) => {
-        if (redirectLocation) {
-            return res.redirect(301, redirectLocation.pathname + redirectLocation.search);
-        }
+    }))
+        .then(() => store.dispatch(timeRequest()))
+        .then(() => match({ routes: routes(store), location: req.url }, (error, redirectLocation, renderProps) => {
+            if (redirectLocation) {
+                return res.redirect(301, redirectLocation.pathname + redirectLocation.search);
+            }
 
-        if (error) {
-            return res.status(500).send(error.message);
-        }
+            if (error) {
+                return res.status(500).send(error.message);
+            }
 
-        if (!renderProps) {
-            return res.status(404).send('Not found');
-        }
+            if (!renderProps) {
+                return res.status(404).send('Not found');
+            }
 
-        const componentHTML = ReactDOM.renderToString(
-            <Provider store={store}>
-                <RouterContext {...renderProps}/>
-            </Provider>
-        );
+            const componentHTML = ReactDOM.renderToString(
+                <Provider store={store}>
+                    <RouterContext {...renderProps}/>
+                </Provider>
+            );
 
-        const state = store.getState();
+            const state = store.getState();
 
-        res.cookie('authHeaders', JSON.stringify(getHeaders(state)), { maxAge: Date.now() + 14 * 24 * 3600 * 100 });
+            res.cookie('authHeaders', JSON.stringify(getHeaders(state)), { maxAge: Date.now() + 14 * 24 * 3600 * 100 });
 
-        return res.end(renderHTML(componentHTML, state));
-    }));
+            return res.end(renderHTML(componentHTML, state));
+        }));
 });
 
 const assetUrl = process.env.NODE_ENV !== 'production' ? 'http://localhost:8050' : '/';
