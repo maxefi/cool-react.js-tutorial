@@ -25,7 +25,7 @@ app.use((req, res) => {
         },
         currentLocation: req.url,
         cookies: req.cookies
-    })).then(() => match({ routes, location: req.url }, (error, redirectLocation, renderProps) => {
+    })).then(() => match({ routes: routes(store), location: req.url }, (error, redirectLocation, renderProps) => {
         if (redirectLocation) {
             return res.redirect(301, redirectLocation.pathname + redirectLocation.search);
         }
