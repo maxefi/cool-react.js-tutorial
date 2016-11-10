@@ -1,6 +1,8 @@
 // explicitly indicate needed components from the libs
 // so webpack only build needed components instead of the whole lib
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+import { isUserSignedIn } from 'redux/models/user';
 import { Link } from 'react-router';
 import LinkContainer from 'react-router-bootstrap/lib/LinkContainer';
 import Grid from 'react-bootstrap/lib/Grid';
@@ -11,11 +13,10 @@ import NavItem from 'react-bootstrap/lib/NavItem';
 import './bootstrap.css';
 
 const propTypes = {
-    children: PropTypes.node
+    children: PropTypes.node,
+    userSignedIn: PropTypes.bool.isRequired
 };
 
-// pure stateless function components
-// no need for shouldComponentUpdate to update
 class App extends Component {
     render() {
         return (
@@ -29,9 +30,11 @@ class App extends Component {
                     </Navbar.Header>
                     <Navbar.Collapse>
                         <Nav navbar>
-                            <LinkContainer to='/time'>
-                                <NavItem>Time</NavItem>
-                            </LinkContainer>
+                            {this.props.userSignedIn && (
+                                <LinkContainer to='/time'>
+                                    <NavItem>Time</NavItem>
+                                </LinkContainer>
+                            )}
                             <LinkContainer to='/counters'>
                                 <NavItem>Counters</NavItem>
                             </LinkContainer>
@@ -48,4 +51,8 @@ class App extends Component {
 
 App.propTypes = propTypes;
 
-export default App;
+function mapStateToProps(state) {
+    return { userSignedIn: isUserSignedIn(state) };
+}
+
+export default connect(mapStateToProps)(App);
