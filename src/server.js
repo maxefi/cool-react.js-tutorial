@@ -1,4 +1,6 @@
 import express from 'express';
+import cookieParser from 'cookie-parser';
+import { getHeaders, initialize } from 'redux-oauth';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
 import { match, RouterContext } from 'react-router';
@@ -8,34 +10,47 @@ import configureStore from './redux/configureStore';
 
 const app = express();
 
+app.use(cookieParser());
+
 app.use((req, res) => {
-        match({ routes, location: req.url }, (error, redirectLocation, renderProps) => {
-            if (redirectLocation) {
-                return res.redirect(301, redirectLocation.pathname + redirectLocation.search);
-            }
+    const store = configureStore();
 
-            if (error) {
-                return res.status(500).send(error.message);
-            }
+    store.dispatch(initialize({
+        backend: {
+            apiUrl: 'https://redux-oauth-backend.herokuapp.com',
+            authProviderPaths: {
+                github: '/auth/github'
+            },
+            signOutPath: null
+        },
+        currentLocation: req.url,
+        cookies: req.cookies
+    })).then(() => match({ routes, location: req.url }, (error, redirectLocation, renderProps) => {
+        if (redirectLocation) {
+            return res.redirect(301, redirectLocation.pathname + redirectLocation.search);
+        }
 
-            if (!renderProps) {
-                return res.status(404).send('Not found');
-            }
+        if (error) {
+            return res.status(500).send(error.message);
+        }
 
-            const store = configureStore();
+        if (!renderProps) {
+            return res.status(404).send('Not found');
+        }
 
-            const componentHTML = ReactDOM.renderToString(
-                <Provider store={store}>
-                    <RouterContext {...renderProps}/>
-                </Provider>
-            );
+        const componentHTML = ReactDOM.renderToString(
+            <Provider store={store}>
+                <RouterContext {...renderProps}/>
+            </Provider>
+        );
 
-            const state = store.getState();
+        const state = store.getState();
 
-            return res.end(renderHTML(componentHTML, state));
-        });
-    }
-);
+        res.cookie('authHeaders', JSON.stringify(getHeaders(state)), { maxAge: Date.now() + 14 * 24 * 3600 * 100 });
+
+        return res.end(renderHTML(componentHTML, state));
+    }));
+});
 
 const assetUrl = process.env.NODE_ENV !== 'production' ? 'http://localhost:8050' : '/';
 
