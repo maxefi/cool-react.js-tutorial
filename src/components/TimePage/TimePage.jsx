@@ -28,7 +28,7 @@ class TimePage extends Component {
             <div>
                 <PageHeader>Timestamp</PageHeader>
                 <Button loading={loading} onClick={this.handleClick}>Get it!</Button>
-                {time && <div>Time: {time}</div>}
+                {time && <h4>Time: {time}</h4>}
             </div>
         );
     }
