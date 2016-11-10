@@ -30,14 +30,16 @@ app.use((req, res) => {
                 </Provider>
             );
 
-            return res.end(renderHTML(componentHTML));
+            const state = store.getState();
+
+            return res.end(renderHTML(componentHTML, state));
         });
     }
 );
 
 const assetUrl = process.env.NODE_ENV !== 'production' ? 'http://localhost:8050' : '/';
 
-function renderHTML(componentHTML) {
+function renderHTML(componentHTML, initialState) {
     return `
         <!DOCTYPE html>
             <html>
@@ -46,6 +48,9 @@ function renderHTML(componentHTML) {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Hello React</title>
                 <link rel="stylesheet" href="${assetUrl}/public/assets/styles.css">
+                <script>
+                    window.REDUX_INITIAL_STATE = ${JSON.stringify(initialState)}
+                </script>
             </head>
             <body>
                 <div id="react-view">${componentHTML}</div>
